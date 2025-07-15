@@ -5,6 +5,7 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Home from './pages/Home.tsx'
 import PageList from './pages/PageList.tsx'
+import Editprice from './pages/Editprice.tsx'
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path:'/Pagelist',
     element: <PageList/>
+  },
+  {
+    path:'/Editprice',
+    element: <Editprice/>
   }
 ])
 

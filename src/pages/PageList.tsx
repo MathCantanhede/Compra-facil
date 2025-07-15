@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, ChevronLeft } from "lucide-react"; // Ícone de lixeira e de voltar
+import { Trash2, ChevronLeft, Pencil } from "lucide-react"; // Ícone de lixeira e de voltar
 
 type Item = {
   id: string;
@@ -24,7 +24,7 @@ function PageList() {
   const handleRemoveItem = (id: string) => {
     const updatedItems = items.filter((item: Item) => item.id !== id);
     setItems(updatedItems);
-    
+
     // Atualiza o localStorage com os itens restantes
     localStorage.setItem("items", JSON.stringify(updatedItems));
   };
@@ -36,18 +36,32 @@ function PageList() {
 
         <div className="mt-6 w-full space-y-4">
           {items.length === 0 ? (
-            <p className="text-xl text-gray-500">Nenhum item adicionado ainda.</p>
+            <p className="text-xl text-gray-500">
+              Nenhum item adicionado ainda.
+            </p>
           ) : (
             items.map((item: Item) => (
-              <div key={item.id} className="flex items-center justify-between p-4 border-b border-gray-200">
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-4 border-b border-gray-200"
+              >
                 <div className="flex-1 text-lg font-semibold text-gray-800">
                   <div className="text-sm">{item.name}</div>
                 </div>
                 <div className="flex-1 text-lg font-semibold text-gray-800">
                   <div className="text-sm">
-                    R${item.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$
+                    {item.price.toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                    })}
                   </div>
                 </div>
+                <button
+                  onClick={() => navigate(`/Editprice/${item.id}`)}
+                  className="text-blue-500 hover:text-blue-700"
+                >
+                  <Pencil size={18} />
+                </button>
                 <button
                   onClick={() => handleRemoveItem(item.id)} // Passando o ID para remover
                   className="text-red-500 hover:text-red-700"
@@ -64,11 +78,8 @@ function PageList() {
           <button
             onClick={() => navigate("/Home")}
             className="flex items-center justify-center space-x-2"
-            
           >
-            <ChevronLeft 
-            className="m-auto"
-            />
+            <ChevronLeft className="m-auto" />
           </button>
         </div>
       </div>
