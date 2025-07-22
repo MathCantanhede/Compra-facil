@@ -21,8 +21,8 @@ const router = createBrowserRouter([
     element: <PageList/>
   },
   {
-    path:'/Editprice',
-    element: <Editprice/>
+    path: '/Editprice/:id', // ✅ Corrigido para aceitar o id dinâmico
+    element: <Editprice />
   }
 ])
 

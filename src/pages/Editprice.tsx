@@ -45,7 +45,7 @@ export default function Editprice() {
     );
 
     localStorage.setItem("items", JSON.stringify(updatedItems));
-    navigate("/list"); // volta para a lista após salvar
+    navigate("/PageList"); // volta para a lista após salvar
   };
 
   if (!item) return <p>Produto não encontrado</p>;
