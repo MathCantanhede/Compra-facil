@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trash2, ChevronLeft, Pencil } from "lucide-react"; // Ícone de lixeira e de voltar
+import { Trash2, ChevronLeft, Pencil } from "lucide-react";
+import { getItemsByUser, deleteItem } from "../services/api";
 
 type Item = {
   id: string;
@@ -12,21 +13,30 @@ function PageList() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
 
+  // 🔁 Substitua por lógica real do usuário autenticado
+  const userId = "123"; // Ex: localStorage.getItem("userId") || contexto
+
   useEffect(() => {
-    // Recupera os itens do localStorage quando a página é carregada
-    const storedItems = localStorage.getItem("items");
-    if (storedItems) {
-      setItems(JSON.parse(storedItems));
-    }
+    fetchItems();
   }, []);
 
-  // Função para remover um item
-  const handleRemoveItem = (id: string) => {
-    const updatedItems = items.filter((item: Item) => item.id !== id);
-    setItems(updatedItems);
+  const fetchItems = async () => {
+    try {
+      const res = await getItemsByUser(userId);
+      setItems(res.data);
+    } catch (err) {
+      console.error("Erro ao buscar itens:", err);
+    }
+  };
 
-    // Atualiza o localStorage com os itens restantes
-    localStorage.setItem("items", JSON.stringify(updatedItems));
+  const handleRemoveItem = async (id: string) => {
+    try {
+      await deleteItem(id);
+      fetchItems(); // Atualiza a lista após remover
+    } catch (err) {
+      console.error("Erro ao remover item:", err);
+      alert("Erro ao remover item.");
+    }
   };
 
   return (
@@ -36,24 +46,19 @@ function PageList() {
 
         <div className="mt-6 w-full space-y-4">
           {items.length === 0 ? (
-            <p className="text-xl text-gray-500">
-              Nenhum item adicionado ainda.
-            </p>
+            <p className="text-xl text-gray-500">Nenhum item adicionado ainda.</p>
           ) : (
-            items.map((item: Item) => (
+            items.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center justify-between p-4 border-b border-gray-200"
               >
-                <div className="flex-1 text-lg font-semibold text-gray-800">
+                <div className="flex-1 text-lg font-semibold text-gray-800 text-left">
                   <div className="text-sm">{item.name}</div>
                 </div>
-                <div className="flex-1 text-lg font-semibold text-gray-800">
+                <div className="flex-1 text-lg font-semibold text-gray-800 text-left">
                   <div className="text-sm">
-                    R$
-                    {item.price.toLocaleString("pt-BR", {
-                      minimumFractionDigits: 2,
-                    })}
+                    R${item.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </div>
                 </div>
                 <button
@@ -63,7 +68,7 @@ function PageList() {
                   <Pencil size={18} />
                 </button>
                 <button
-                  onClick={() => handleRemoveItem(item.id)} // Passando o ID para remover
+                  onClick={() => handleRemoveItem(item.id)}
                   className="text-red-500 hover:text-red-700"
                 >
                   <Trash2 size={20} />
@@ -74,7 +79,7 @@ function PageList() {
         </div>
 
         {/* Botão de Voltar */}
-        <div className="mt-8 w-1 flex items-center justify-center cursor-pointer  bg-[#D4F3A2] rounded-lg p-3 shadow-md hover:bg-[#A2DFA3] transition duration-300 ease-in-out m-auto">
+        <div className="mt-8 w-1 flex items-center justify-center cursor-pointer bg-[#D4F3A2] rounded-lg p-3 shadow-md hover:bg-[#A2DFA3] transition duration-300 ease-in-out m-auto">
           <button
             onClick={() => navigate("/Home")}
             className="flex items-center justify-center space-x-2"

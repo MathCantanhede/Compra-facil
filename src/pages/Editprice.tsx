@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { getItemById, updateItem } from "../services/api";
 
 type Item = {
   id: string;
@@ -15,18 +16,23 @@ export default function Editprice() {
   const [price, setPrice] = useState<string>("");
 
   useEffect(() => {
-    const storedItems = localStorage.getItem("items");
-    if (storedItems) {
-      const items: Item[] = JSON.parse(storedItems);
-      const found = items.find((i) => i.id === id);
-      if (found) {
-        setItem(found);
-        setPrice(found.price.toString());
+    if (!id) return;
+
+    const fetchItem = async () => {
+      try {
+        const res = await getItemById(id);
+        setItem(res.data);
+        setPrice(res.data.price.toString());
+      } catch (err) {
+        console.error("Erro ao buscar item:", err);
+        alert("Item não encontrado.");
       }
-    }
+    };
+
+    fetchItem();
   }, [id]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!item) return;
 
@@ -36,19 +42,16 @@ export default function Editprice() {
       return;
     }
 
-    const storedItems = localStorage.getItem("items");
-    if (!storedItems) return;
-
-    const items: Item[] = JSON.parse(storedItems);
-    const updatedItems = items.map((i) =>
-      i.id === item.id ? { ...i, price: updatedPrice } : i
-    );
-
-    localStorage.setItem("items", JSON.stringify(updatedItems));
-    navigate("/PageList"); // volta para a lista após salvar
+    try {
+      await updateItem(item.id, { price: updatedPrice });
+      navigate("/PageList");
+    } catch (err) {
+      console.error("Erro ao atualizar item:", err);
+      alert("Erro ao salvar o item.");
+    }
   };
 
-  if (!item) return <p>Produto não encontrado</p>;
+  if (!item) return <p className="text-center p-8">Produto não encontrado</p>;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-100">
@@ -69,7 +72,7 @@ export default function Editprice() {
           <div className="flex justify-between">
             <button
               type="button"
-              onClick={() => navigate("/list")}
+              onClick={() => navigate("/PageList")}
               className="px-6 py-2 rounded bg-gray-300 hover:bg-gray-400"
             >
               Cancelar

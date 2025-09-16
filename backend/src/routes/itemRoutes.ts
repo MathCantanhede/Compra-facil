@@ -7,9 +7,9 @@ import {
 } from "../controllers/itemController";
 const router = Router();
 
-router.get("/items/:userId", getItemsByUser);
-router.post("/items", createItem);
-router.put("/items/:id", updateItem);
-router.delete("/items/:id", deleteItem);
+router.post("/", createItem);
+router.get("/:userId", getItemsByUser);
+router.put("/:id", updateItem);
+router.delete("/:id", deleteItem);
 
 export default router;

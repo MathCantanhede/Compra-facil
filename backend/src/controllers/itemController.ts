@@ -13,18 +13,27 @@ export const getItemsByUser = async (req: Request, res: Response) => {
 
 export const createItem = async (req: Request, res: Response) => {
   const { name, price, userId } = req.body;
-  if (!name || !price || !userId)
+
+  if (!name || !price || !userId) {
     return res.status(400).json({ error: "Dados incompletos" });
+  }
 
   try {
     const item = await prisma.item.create({
-      data: { name, price: parseFloat(price), userId },
+      data: {
+        name,
+        price: parseFloat(price),
+        userId, // ✅ já é string (UUID)
+      },
     });
+
     res.status(201).json(item);
-  } catch {
+  } catch (error) {
+    console.error("Erro ao criar item:", error);
     res.status(500).json({ error: "Erro ao criar item" });
   }
 };
+
 
 export const updateItem = async (req: Request, res: Response) => {
   const { id } = req.params;

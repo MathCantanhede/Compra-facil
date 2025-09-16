@@ -1,8 +1,5 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -13,7 +10,7 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   name      String
-  items     Item[]   // relação com os itens
+  items     Item[]
   createdAt DateTime @default(now())
 }
 
