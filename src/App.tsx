@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 import Input from "./components/Input";
 import Button from "./components/Button";
 
@@ -8,41 +7,42 @@ function App() {
   const navigate = useNavigate();
   const [name, setName] = useState<string>("");
 
-  // Função para tratar o envio do formulário de nome
-  const handleSubmit = async () => {
-    if (name.trim() === "") {
-      alert("Por favor, preencha o campo com seu Nome");
-      return;
+ const handleSubmit = async () => {
+  if (name.trim() === "") {
+    alert("Por favor, preencha o campo com seu Nome");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3001/user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name, // só manda o nome, sem id
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro ao salvar no banco");
     }
 
-    const uuid = uuidv4(); // Gerar UUID antes de enviar
+    // Pega os dados que o backend retornou
+    const data = await response.json();
 
-    try {
-      const response = await fetch("http://localhost:3001/user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name,
-        }),
-      });
+    // Salva o id real que o Prisma gerou
+    localStorage.setItem("userId", data.id);
+    localStorage.setItem("userName", data.name);
 
-      if (!response.ok) {
-        throw new Error("Erro ao salvar no banco");
-      }
+    // Redireciona para a página Home
+    navigate("/home");
+  } catch (error) {
+    console.error(error);
+    alert("Erro ao conectar com o servidor");
+  }
+};
 
-      // Salvar no localStorage
-      localStorage.setItem("userId", uuid);
-      localStorage.setItem("userName", name);
-
-      // Redireciona para a página Home
-      navigate("/home");
-    } catch (error) {
-      console.error(error);
-      alert("Erro ao conectar com o servidor");
-    }
-  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-green-300">

@@ -12,23 +12,36 @@ type Item = {
 function PageList() {
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 🔁 Substitua por lógica real do usuário autenticado
-  const userId = "123"; // Ex: localStorage.getItem("userId") || contexto
+  // ✅ Recupera o userId do localStorage
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
+    if (!userId) {
+      // Se não tiver userId salvo, redireciona pro login
+      navigate("/");
+      return;
+    }
     fetchItems();
   }, []);
 
+  // ✅ Busca itens do usuário no backend
   const fetchItems = async () => {
     try {
+      if (!userId) return;
+      setLoading(true);
       const res = await getItemsByUser(userId);
       setItems(res.data);
     } catch (err) {
       console.error("Erro ao buscar itens:", err);
+      alert("Erro ao buscar itens.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // ✅ Remove item e atualiza lista
   const handleRemoveItem = async (id: string) => {
     try {
       await deleteItem(id);
@@ -45,7 +58,9 @@ function PageList() {
         <p className="text-xl font-semibold text-blue-600">Lista de Compras</p>
 
         <div className="mt-6 w-full space-y-4">
-          {items.length === 0 ? (
+          {loading ? (
+            <p className="text-gray-500">Carregando...</p>
+          ) : items.length === 0 ? (
             <p className="text-xl text-gray-500">Nenhum item adicionado ainda.</p>
           ) : (
             items.map((item) => (
@@ -58,7 +73,10 @@ function PageList() {
                 </div>
                 <div className="flex-1 text-lg font-semibold text-gray-800 text-left">
                   <div className="text-sm">
-                    R${item.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$
+                    {item.price.toLocaleString("pt-BR", {
+                      minimumFractionDigits: 2,
+                    })}
                   </div>
                 </div>
                 <button
