@@ -14,6 +14,8 @@ export default function Editprice() {
 
   const [item, setItem] = useState<Item | null>(null);
   const [price, setPrice] = useState<string>("");
+  console.log("ID vindo do useParams:", id);
+
 
   useEffect(() => {
     if (!id) return;

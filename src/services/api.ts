@@ -5,7 +5,7 @@ const api = axios.create({
 });
 
 export const getItemsByUser = (userId: string) =>
-  api.get(`/items/${userId}`);
+  api.get(`/items/user/${userId}`);
 
 export const createItem = (item: { name: string; price: number; userId: string }) =>
   api.post("/items", item);
@@ -17,6 +17,9 @@ export const updateItem = (id: string, data: { price: number }) =>
   api.put(`/items/${id}`, data);
 
 export const getItemById = (id: string) =>
-  api.get(`/items/${id}`);
+  api.get(`/items/id/${id}`);
+
+
+
 
 export default api;
